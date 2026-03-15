@@ -1,5 +1,5 @@
 { "name": "@ubhd-as22/http-server-base",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Basic HTTP server plumbing for anno-server-22.",
   "keywords": [],
 
@@ -19,7 +19,7 @@
 
   "private": false, "license": "MIT",
 
-  "main": "src/server.mjs",
+  "main": "minus-r-cli.mjs",
   "scripts": {
     "sh": "\"$@\"",
     "lint": "elp",
@@ -30,6 +30,9 @@
   "eslintConfig": { "extends": "nodejs-pmb" },
 
   "dependencies": {
+    "express": "^4.19.2",
+    "p-fatal": "^0.1.6",
+    "usnam-pmb": "^0.2.5"
   },
   "devDependencies": {
     "eslint-config-nodejs-pmb": "^0.3.13",
