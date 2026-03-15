@@ -3,6 +3,11 @@
 import 'p-fatal';
 import 'usnam-pmb';
 
+import parseCliArgs from 'cfg-cli-env-180111-pmb/node.js';
+/* parseCliArgs: because we do NOT use the "env" part.
+    Environment options are dealt with in `serverCore.mjs`,
+    using another module. */
+
 
 import makeServer from './makeServer.mjs';
 
@@ -10,14 +15,18 @@ import makeServer from './makeServer.mjs';
 const EX = async function runServer() {
   process.chdir('/');
 
+  const { allCliOpt } = parseCliArgs(); // see import above!
   console.debug(
     'node.js version:', process.version,
     'server pid:', process.pid,
+    'server CLI options:', allCliOpt,
   );
 
   const srv = await makeServer({
+    ...allCliOpt,
   });
 
+  srv.initialConfigDone();
   await srv.listen();
 };
 
