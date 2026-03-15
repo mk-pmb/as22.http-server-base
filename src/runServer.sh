@@ -24,6 +24,7 @@ function run_cli_main () {
   local -A CFG=(
     [run_task]='run_server_show_log_on_failure'
     [git_safe_subdirs]=
+    [lint]=
     [run_prog]='nodejs'
     [log_dest]="logs.@$HOSTNAME/server.log"
     )
@@ -96,6 +97,19 @@ function actually_run_server () {
     VAL+="$(report_git_status_concisely)"
   fi
   log_progress "Git status: $VAL"
+
+  local LINT="${CFG[lint]}"
+  if [ -n "$LINT" ]; then
+    [ "$LINT" == + ] && LINT='e'lp # broken quote to hide from guess-js-deps
+    log_progress "Running linter in hsb path: $LINT"
+    ( cd -- "$HSB_PATH" && "$LINT" ) || return $?
+    if [ "$HSB_PATH" -ef . ]; then
+      true
+    else
+      log_progress "Running linter in app path: $LINT"
+      "$LINT" || return $?
+    fi
+  fi
 
   # In case we're process ID 1 (e.g. in docker), we must either forward
   # signals like SIGTERM, or hand over PID 1 to a program that can ensure
