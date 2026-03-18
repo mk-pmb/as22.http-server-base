@@ -10,6 +10,7 @@ import objPop from 'objpop';
 import installListenAddrPlumbing from './listenAddrPlumbing.mjs';
 import installRootRouter from './hnd/rootRoutes.mjs';
 import loggingUtil from './hnd/util/logging.mjs';
+import setupCleanExit from './setupCleanExit.mjs';
 
 
 const EX = async function createServer(customConfig) {
@@ -44,6 +45,7 @@ const EX = async function createServer(customConfig) {
   });
 
   await installListenAddrPlumbing(srv);
+  await setupCleanExit(srv);
 
   srv.globalRequestExtras({
     ...loggingUtil.requestExtras,
@@ -64,6 +66,8 @@ Object.assign(EX, {
     notify_server_listening: '',
     public_baseurl: '',
     wwwpub_path: process.cwd() + '/wwwpub',
+
+    ...setupCleanExit.cliConfigDefaults,
 
   },
 
