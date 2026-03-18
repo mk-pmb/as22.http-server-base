@@ -63,6 +63,7 @@ Object.assign(EX, {
     listen_addr: '127.0.0.1:33321',
     notify_server_listening: '',
     public_baseurl: '',
+    wwwpub_path: process.cwd() + '/wwwpub',
 
   },
 
