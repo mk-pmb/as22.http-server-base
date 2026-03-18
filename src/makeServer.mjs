@@ -8,6 +8,8 @@ import objPop from 'objpop';
 
 
 import installListenAddrPlumbing from './listenAddrPlumbing.mjs';
+import installRootRouter from './hnd/rootRoutes.mjs';
+import loggingUtil from './hnd/util/logging.mjs';
 
 
 const EX = async function createServer(customConfig) {
@@ -19,8 +21,8 @@ const EX = async function createServer(customConfig) {
 
   const webSrv = nodeHttp.createServer();
   const srv = {
+    ...loggingUtil.basics,
     getLowLevelWebServer() { return webSrv; },
-    logMsg: console.log.bind(console),
     popCfg,
 
     initialConfigDone() {
@@ -35,12 +37,17 @@ const EX = async function createServer(customConfig) {
   app.set('case sensitive routing', true);
   app.set('etag', false);
   app.set('strict routing', true);
+  app.use(await installRootRouter(srv));
 
   app.once('close', function cleanup(...args) {
     console.debug('App cleanup:', args);
   });
 
   await installListenAddrPlumbing(srv);
+
+  srv.globalRequestExtras({
+    ...loggingUtil.requestExtras,
+  });
 
   webSrv.on('request', app);
   return srv;
