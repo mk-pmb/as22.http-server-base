@@ -67,6 +67,7 @@ Object.assign(EX, {
     listen_port: 8080,
     notify_server_listening: '',
     public_baseurl: '',
+    wwwpub_path: process.cwd() + '/wwwpub',
 
   },
 
