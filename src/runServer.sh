@@ -142,8 +142,24 @@ function tee_output_to_logfile () {
 
 
 function tee_output_to_logfile__then_optimize () {
-  tee -- "$LOGF" || return $?
+  local TRACE="$FUNCNAME[$$]:"
+  # Use setsid to have our tee survive SIGINT (Ctrl+C), so we can still
+  # log the server's exit messages. (If the pipe to tee would break
+  # immediately, we'd be effectively blind.)
+  setsid tee -- "$LOGF"
+  local TEE_RV=$?
+  case "$TEE_RV" in
+    0 ) ;;
+    [1-9][0-9][0-9] )
+      echo W: "$TRACE Our tee was killed (rv=$TEE_RV) despite setsid!";;
+    * )
+      echo W: "$TRACE tee failed, rv=$TEE_RV" >&2
+      return "$TEE_RV";;
+  esac
+  echo D: $TRACE 'Cleaning up the log file…'
   "$HSB_PATH"/src/unclutter_server_logfile.sed -i -- "$LOGF" || return $?
+  echo D: $TRACE 'Done.'
+  return "$TEE_RV"
 }
 
 
