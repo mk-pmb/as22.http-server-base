@@ -1,0 +1,7 @@
+# -*- coding: utf-8 -*-
+
+User-Agent: *
+Disallow: /admin/
+Disallow: /api/
+Disallow: /debug/
+Disallow: /session/

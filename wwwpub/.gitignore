@@ -1,0 +1,12 @@
+
+# Site-specific stuff
+/site
+/local
+
+
+# Automatically generated content
+/node_modules
+
+
+
+# Unsorted stuff (this section should be empty):
