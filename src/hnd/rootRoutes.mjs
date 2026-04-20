@@ -20,17 +20,31 @@ const trailingSlashMatters = true; /*
   */
 
 
-const EX = async function installRootRouter(srv) {
+const doNothing = Boolean;
+
+function hideInGetter(x) { return function get() { return x; }; }
+
+
+const EX = async function installRootRouter(srv, how) {
+  const hookCtx = { srv, getRootRouterHow: hideInGetter(how) };
   const { popCfg } = srv;
   const rt = PrRouter({ strict: trailingSlashMatters });
   // eslint-disable-next-line no-param-reassign
-  srv.getRootRouter = Object.bind(null, rt);
+  srv.getRootRouter = hideInGetter(rt);
+  rt.getServer = hideInGetter(srv);
+
+  await srv.runHook('server/installGlobalRequestExtras/before', hookCtx);
   await installGlobalRequestExtras(srv, rt);
+  await srv.runHook('server/installGlobalRequestExtras/after', hookCtx);
+
   rt.use(cookieParser());
   rt.use(loggingUtil.middleware.logIncomingRequest);
 
-  // :TODO: Hook to register custom routes here.
+  await srv.runHook('server/installMainRoutes/before', hookCtx);
+  await (how.installMainRoutes || doNothing)(rt, how);
+  await srv.runHook('server/installMainRoutes/after', hookCtx);
 
+  await srv.runHook('server/siteLocalReservedRoutes/before', hookCtx);
   siteLocalReservedRoutes.installRoutes(rt); // safe to ignore.
 
   // Static file serving for use as a stand-alone debug server:
@@ -43,6 +57,8 @@ const EX = async function installRootRouter(srv) {
 
   // If no previous route has matched, default to:
   rt.use(httpErrors.noHandlerForUrl);
+
+  await srv.runHook('server/installRootRouter/after', hookCtx);
   return rt;
 };
 

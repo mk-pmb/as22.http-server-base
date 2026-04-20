@@ -2,6 +2,7 @@
 
 import envcfgMergeConfigs from 'envcfg-merge-configs-pmb';
 import express from 'express';
+import makeHookRunner from 'hookrunner25a-pmb';
 import mustBe from 'typechecks-pmb/must-be.js';
 import nodeHttp from 'node:http';
 import objPop from 'objpop';
@@ -14,9 +15,11 @@ import setupCiTestFeatures from './setupCiTestFeatures.mjs';
 import setupCleanExit from './setupCleanExit.mjs';
 
 
-const EX = async function createServer(customConfig) {
+const EX = async function createServer(how) {
   const entireConfig = envcfgMergeConfigs({ ifPrefixProp: 'envcfg_prefix' },
-    EX.cliConfigDefaults, customConfig);
+    EX.cliConfigDefaults,
+    how.cliConfigDefaults,
+    how.allCliOpt);
   const popCfg = objPop.d(entireConfig, { mustBe }).mustBe;
   popCfg('str | eeq:false', 'envcfg_prefix');
   console.debug('Server config:', entireConfig);
@@ -26,6 +29,7 @@ const EX = async function createServer(customConfig) {
     ...loggingUtil.basics,
     getLowLevelWebServer() { return webSrv; },
     popCfg,
+    runHook: makeHookRunner(),
 
     initialConfigDone() {
       popCfg.expectEmpty('Unsupported server config option(s)');
@@ -33,16 +37,21 @@ const EX = async function createServer(customConfig) {
     },
 
   };
+  await srv.runHook('server/makeServer/early', { srv, how });
 
   const app = express();
   app.set('x-powered-by', false);
   app.set('case sensitive routing', true);
   app.set('etag', false);
   app.set('strict routing', true);
-  app.use(await installRootRouter(srv));
+  await srv.runHook('server/expressApp/config', { app, srv });
 
-  app.once('close', function cleanup(...args) {
+  app.use(await installRootRouter(srv, how));
+
+  app.once('close', async function cleanup(...args) {
     console.debug('App cleanup:', args);
+    await srv.runHook('server/cleanup/before', { srv, args });
+    await srv.runHook('server/cleanup/after', { srv, args });
   });
 
   await installListenAddrPlumbing(srv);
@@ -53,7 +62,10 @@ const EX = async function createServer(customConfig) {
     ...loggingUtil.requestExtras,
   });
 
+  await srv.runHook('server/installRequestHandler/before', { app, srv });
   webSrv.on('request', app);
+  await srv.runHook('server/installRequestHandler/after', { app, srv });
+  await srv.runHook('server/makeServer/after', { srv, how });
   return srv;
 };
 

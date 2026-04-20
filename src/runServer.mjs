@@ -9,6 +9,7 @@ import parseCliArgs from 'cfg-cli-env-180111-pmb/node.js';
     using another module. */
 
 
+import appBaseDirOps from './appBaseDirOps.mjs';
 import makeServer from './makeServer.mjs';
 
 
@@ -16,6 +17,7 @@ const EX = async function runServer() {
   process.chdir('/');
 
   const { allCliOpt } = parseCliArgs(); // see import above!
+  const initCfg = await appBaseDirOps.importJs('src/serverInitConfig.mjs');
   console.debug(
     'node.js version:', process.version,
     'server pid:', process.pid,
@@ -23,7 +25,8 @@ const EX = async function runServer() {
   );
 
   const srv = await makeServer({
-    ...allCliOpt,
+    allCliOpt,
+    ...initCfg,
   });
 
   srv.initialConfigDone();
