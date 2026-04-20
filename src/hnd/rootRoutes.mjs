@@ -20,16 +20,20 @@ const trailingSlashMatters = true; /*
   */
 
 
-const EX = async function installRootRouter(srv) {
+const doNothing = Boolean;
+
+
+const EX = async function installRootRouter(srv, how) {
   const { popCfg } = srv;
   const rt = PrRouter({ strict: trailingSlashMatters });
   // eslint-disable-next-line no-param-reassign
   srv.getRootRouter = Object.bind(null, rt);
+  rt.getServer = Object.bind(null, srv);
   await installGlobalRequestExtras(srv, rt);
   rt.use(cookieParser());
   rt.use(loggingUtil.middleware.logIncomingRequest);
 
-  // :TODO: Hook to register custom routes here.
+  await (how.installMainRoutes || doNothing)(rt, how);
 
   siteLocalReservedRoutes.installRoutes(rt); // safe to ignore.
 

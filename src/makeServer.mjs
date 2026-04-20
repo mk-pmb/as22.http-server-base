@@ -14,9 +14,11 @@ import setupCiTestFeatures from './setupCiTestFeatures.mjs';
 import setupCleanExit from './setupCleanExit.mjs';
 
 
-const EX = async function createServer(customConfig) {
+const EX = async function createServer(how) {
   const entireConfig = envcfgMergeConfigs({ ifPrefixProp: 'envcfg_prefix' },
-    EX.cliConfigDefaults, customConfig);
+    EX.cliConfigDefaults,
+    how.cliConfigDefaults,
+    how.allCliOpt);
   const popCfg = objPop.d(entireConfig, { mustBe }).mustBe;
   popCfg('str | eeq:false', 'envcfg_prefix');
   console.debug('Server config:', entireConfig);
@@ -39,7 +41,7 @@ const EX = async function createServer(customConfig) {
   app.set('case sensitive routing', true);
   app.set('etag', false);
   app.set('strict routing', true);
-  app.use(await installRootRouter(srv));
+  app.use(await installRootRouter(srv, how));
 
   app.once('close', function cleanup(...args) {
     console.debug('App cleanup:', args);
