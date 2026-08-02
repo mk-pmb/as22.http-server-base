@@ -23,6 +23,8 @@ const simpleCanneds = {
 
   noSuchResource,
   noHandlerForUrl: noSuchResource.explain('No handler for this URL.'),
+  unexpectedlySlowTask: makeCanned(500, 'Internal Server Error'
+    + ': Task exceeds expected time limit. Technical details, if provided'),
   fubar: makeCanned(500, 'Internal Server Error'),
 
   genericDeny: makeCanned(403, 'Forbidden'),

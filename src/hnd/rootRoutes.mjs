@@ -9,6 +9,7 @@ import installGlobalRequestExtras from './globalRequestExtras.mjs';
 import installStaticWebspaceHandler from './staticWebspaceHandler.install.mjs';
 import loggingUtil from './util/logging.mjs';
 import siteLocalReservedRoutes from './siteLocalReservedRoutes.mjs';
+import timeoutFallbackResponse from './timeoutFallbackResponse.mjs';
 
 
 const trailingSlashMatters = true; /*
@@ -37,6 +38,7 @@ const EX = async function installRootRouter(srv, how) {
   await installGlobalRequestExtras(srv, rt);
   await srv.runHook('server/installGlobalRequestExtras/after', hookCtx);
 
+  rt.use(timeoutFallbackResponse(popCfg));
   rt.use(cookieParser());
   rt.use(loggingUtil.middleware.logIncomingRequest);
 
