@@ -1,0 +1,12 @@
+
+# Host-specific stuff. (See the top-level .gitignore for explanation.)
+/*.@*
+
+
+
+# Auto-generated files:
+/tmp.*
+
+
+
+# Unsorted stuff (this section should be empty):

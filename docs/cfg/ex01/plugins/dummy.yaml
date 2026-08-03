@@ -1,0 +1,24 @@
+%YAML 1.2
+# -*- coding: UTF-8, tab-width: 2 -*-
+---
+
+^:
+  import: 'plugins.@local/dummy/index.mjs'
+  # The import path is relative to the top level directory of your
+  # app directory. You can use `../`, but if you run the server in docker,
+  # be aware that the repo is mapped to `/app`, so you most likely want to
+  # install your plugins into a subdirectory inside that.
+
+
+  ifMissing: 'error'
+  # What shall the app do if the plugin cannot be loaded?
+  # * 'error': Refuse to start.
+  # * 'warn': Accept missing features.
+
+
+  whatever: 'plugin-specific stuff'
+  # All other options are plugin-specific.
+
+
+
+...

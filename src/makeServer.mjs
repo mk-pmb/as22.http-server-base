@@ -8,11 +8,14 @@ import nodeHttp from 'node:http';
 import objPop from 'objpop';
 
 
+import configFilesAdapter from './cfg/configFilesAdapter/ad.mjs';
 import installListenAddrPlumbing from './listenAddrPlumbing.mjs';
 import installRootRouter from './hnd/rootRoutes.mjs';
 import loggingUtil from './hnd/util/logging.mjs';
 import setupCiTestFeatures from './setupCiTestFeatures.mjs';
 import setupCleanExit from './setupCleanExit.mjs';
+
+const doNothing = Boolean;
 
 
 const EX = async function createServer(how) {
@@ -27,6 +30,7 @@ const EX = async function createServer(how) {
   const webSrv = nodeHttp.createServer();
   const srv = {
     ...loggingUtil.basics,
+    configFiles: await configFilesAdapter.make({ popCfg }),
     getLowLevelWebServer() { return webSrv; },
     popCfg,
     runHook: makeHookRunner(),
@@ -37,7 +41,11 @@ const EX = async function createServer(how) {
     },
 
   };
+  await (how.installHooks || doNothing)(srv, how);
   await srv.runHook('server/makeServer/early', { srv, how });
+
+  await (how.installPlugins || doNothing)(srv, how);
+  // ^-- e.g. from `./pluginsLib.mjs`, await pluginsLib.install(srv);
 
   const app = express();
   app.set('x-powered-by', false);
@@ -77,6 +85,7 @@ Object.assign(EX, {
 
   cliConfigDefaults: {
 
+    cfgfiles: configFilesAdapter.getConfigDefaults(),
     envcfg_prefix: 'anno_',
 
     listen_addr: (guessDockerized ? '0.0.0.0' : '127.0.0.1'),
