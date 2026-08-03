@@ -42,8 +42,14 @@ const EX = async function readAsDict(topic) {
       hadPlaceholder = true;
       return;
     }
-    mustBe.dictObj('Config data in file ' + fullPath, cfg);
-    cfg = mapKeys(cfg, (v, k) => k.replace(/\^/g, bfn));
+    if (Array.isArray(cfg)) {
+      // NB:  This is just to make it available as bfn. If you use it with
+      //      learnTopicDict, the latter will wrap it again, as `rawList`.
+      cfg = { [bfn]: cfg };
+    } else {
+      mustBe.dictObj('Config data in file ' + fullPath, cfg);
+      cfg = mapKeys(cfg, (v, k) => k.replace(/\^/g, bfn));
+    }
     return cfg;
   });
 
