@@ -12,6 +12,7 @@ import configFilesAdapter from './cfg/configFilesAdapter/ad.mjs';
 import installListenAddrPlumbing from './listenAddrPlumbing.mjs';
 import installRootRouter from './hnd/rootRoutes.mjs';
 import loggingUtil from './hnd/util/logging.mjs';
+import makeRequestBodyParser from './hnd/util/parseRequestBody.mjs';
 import setupCiTestFeatures from './setupCiTestFeatures.mjs';
 import setupCleanExit from './setupCleanExit.mjs';
 
@@ -68,6 +69,7 @@ const EX = async function createServer(how) {
 
   srv.globalRequestExtras({
     ...loggingUtil.requestExtras,
+    ...makeRequestBodyParser.util.requestExtras(popCfg),
   });
 
   await srv.runHook('server/installRequestHandler/before', { app, srv });
