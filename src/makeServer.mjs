@@ -9,12 +9,14 @@ import objPop from 'objpop';
 
 
 import configFilesAdapter from './cfg/configFilesAdapter/ad.mjs';
+import fallbackErrorHandler from './hnd/fallbackErrorHandler.mjs';
 import installListenAddrPlumbing from './listenAddrPlumbing.mjs';
 import installRootRouter from './hnd/rootRoutes.mjs';
 import loggingUtil from './hnd/util/logging.mjs';
 import makeRequestBodyParser from './hnd/util/parseRequestBody.mjs';
 import setupCiTestFeatures from './setupCiTestFeatures.mjs';
 import setupCleanExit from './setupCleanExit.mjs';
+
 
 const doNothing = Boolean;
 
@@ -56,6 +58,7 @@ const EX = async function createServer(how) {
   await srv.runHook('server/expressApp/config', { app, srv });
 
   app.use(await installRootRouter(srv, how));
+  app.use(fallbackErrorHandler.decide(popCfg, webSrv));
 
   app.once('close', async function cleanup(...args) {
     console.debug('App cleanup:', args);
