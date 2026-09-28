@@ -13,6 +13,7 @@ import fallbackErrorHandler from './hnd/fallbackErrorHandler.mjs';
 import installListenAddrPlumbing from './listenAddrPlumbing.mjs';
 import installRootRouter from './hnd/rootRoutes.mjs';
 import loggingUtil from './hnd/util/logging.mjs';
+import makeGenericCorsHandler from './hnd/util/genericCorsHandler.mjs';
 import makeRequestBodyParser from './hnd/util/parseRequestBody.mjs';
 import setupCiTestFeatures from './setupCiTestFeatures.mjs';
 import setupCleanExit from './setupCleanExit.mjs';
@@ -70,7 +71,9 @@ const EX = async function createServer(how) {
   await setupCleanExit(srv);
   await setupCiTestFeatures(srv);
 
+  const confirmCorsImpl = makeGenericCorsHandler();
   srv.globalRequestExtras({
+    confirmCors() { return confirmCorsImpl(this); },
     ...loggingUtil.requestExtras,
     ...makeRequestBodyParser.util.requestExtras(popCfg),
   });
