@@ -19,6 +19,7 @@ const simpleCanneds = {
   badVerb: makeCanned(405, 'Method Not Allowed'),
   stateConflict: makeCanned(409, 'Conflict'),
   gone: makeCanned(410, 'Gone'),
+  badBodyData: makeCanned(422, 'Unprocessable Entity'),
   notImpl: makeCanned(501, 'Not Implemented'),
 
   noSuchResource,
