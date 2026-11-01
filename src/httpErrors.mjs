@@ -31,8 +31,10 @@ const simpleCanneds = {
   genericDeny: makeCanned(403, 'Forbidden'),
   aclDeny: makeCanned(403, 'Forbidden by ACL'),
 
+  badGateway: makeCanned(502, 'Bad Gateway'),
   databaseUnavailable: makeCanned(503,
     'Database server is unavailable or too busy.'),
+  gatewayTimeout: makeCanned(504, 'Gateway Timeout'),
 
 };
 

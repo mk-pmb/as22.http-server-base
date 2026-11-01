@@ -1,5 +1,5 @@
 { "name": "@ubhd-as22/http-server-base",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Basic HTTP server plumbing for anno-server-22.",
   "keywords": [],
 
