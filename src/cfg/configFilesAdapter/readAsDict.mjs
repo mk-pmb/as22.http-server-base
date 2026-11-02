@@ -31,7 +31,7 @@ const EX = async function readAsDict(topic) {
     || []).filter(coreApi.isPluggableConfigFilename).sort();
   let hadPlaceholder = false;
   const dirConfigPrs = dirCfgFiles.map(async function oneCfgFile(name) {
-    const bfn = name.slice(0, cutSuf);
+    const bfn = EX.cleanupBaseName(name.slice(0, cutSuf));
     const fullPath = pathLib.join(basePath, name);
     let cfg = await oppoRead.readConfigFileIfExists(fullPath);
     if (cfg === undefined) {
@@ -84,6 +84,13 @@ Object.assign(EX, {
   acceptedPlaceholderNames: [
     'PLACEHOLDER',
   ],
+
+
+  cleanupBaseName(orig) {
+    let bn = orig;
+    bn = bn.split('.@')[0];
+    return bn;
+  },
 
 
 
